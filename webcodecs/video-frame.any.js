@@ -113,7 +113,7 @@ test(t => {
   }, 'invalid pixel format');
 
   assert_throws_js(TypeError, () => {
-    let frame = new VideoFrame([], {format: 'ARGB', timestamp: 1234});
+    let frame = new VideoFrame([], {format: 'RGBA', timestamp: 1234});
   }, 'missing coded size');
 
   function constructFrame(init) {
@@ -326,31 +326,19 @@ test(t => {
   // TODO(sandersd): Remove |rows| if/when VideoFrame.planes[] is removed.
   // The value is used only by verifyPlane().
   let argbPlane = {src: argbPlaneData, stride: 4 * 4, rows: 2};
-  let frame = new VideoFrame([argbPlane], {...vfInit, format: 'ABGR'});
+  let frame = new VideoFrame([argbPlane], {...vfInit, format: 'RGBA'});
   assert_equals(frame.planes.length, 1, 'plane count');
-  assert_equals(frame.format, 'ABGR', 'plane format');
+  assert_equals(frame.format, 'RGBA', 'plane format');
   verifyPlane(argbPlane, frame.planes[0]);
   frame.close();
 
-  frame = new VideoFrame([argbPlane], {...vfInit, format: 'ARGB'});
+  frame = new VideoFrame([argbPlane], {...vfInit, format: 'BGRA'});
   assert_equals(frame.planes.length, 1, 'plane count');
-  assert_equals(frame.format, 'ARGB', 'plane format');
+  assert_equals(frame.format, 'BGRA', 'plane format');
   verifyPlane(argbPlane, frame.planes[0]);
   frame.close();
 
-  frame = new VideoFrame([argbPlane], {...vfInit, format: 'XBGR'});
-  assert_equals(frame.planes.length, 1, 'plane count');
-  assert_equals(frame.format, 'XBGR', 'plane format');
-  verifyPlane(argbPlane, frame.planes[0]);
-  frame.close();
-
-  frame = new VideoFrame([argbPlane], {...vfInit, format: 'XRGB'});
-  assert_equals(frame.planes.length, 1, 'plane count');
-  assert_equals(frame.format, 'XRGB', 'plane format');
-  verifyPlane(argbPlane, frame.planes[0]);
-  frame.close();
-
-  ['ABGR', 'ARGB', 'XBGR', 'XRGB'].forEach(fmt => {
+  ['RGBA', 'BGRA'].forEach(fmt => {
     assert_throws_dom('ConstraintError', () => {
       let frame = new VideoFrame([], {...vfInit, format: fmt});
     }, fmt + ': too few planes');
@@ -434,47 +422,48 @@ test(t => {
   let argbPlaneData =
       new Uint8Array(new Uint32Array([1, 2, 3, 4, 5, 6, 7, 8]).buffer);
   let argbPlane = {src: argbPlaneData, stride: 4 * 4};
-  let frame = new VideoFrame([argbPlane], {...vfInit, format: 'ABGR'});
+  let frame = new VideoFrame([argbPlane], {...vfInit, format: 'RGBA'});
   assert_equals(frame.planes.length, 1, 'plane count');
-  assert_equals(frame.format, 'ABGR', 'plane format');
+  assert_equals(frame.format, 'RGBA', 'plane format');
 
   let alpha_frame_copy = new VideoFrame(frame, {alpha: 'keep'});
-  assert_equals(alpha_frame_copy.format, 'ABGR', 'plane format');
+  assert_equals(alpha_frame_copy.format, 'RGBA', 'plane format');
 
+  // TODO(github.com/w3c/webcodecs/issues/207): Verify hasAlpha.
   let opaque_frame_copy = new VideoFrame(frame, {alpha: 'discard'});
-  assert_equals(opaque_frame_copy.format, 'XBGR', 'plane format');
+  assert_equals(opaque_frame_copy.format, 'RGBA', 'plane format');
 
   alpha_frame_copy.close();
   opaque_frame_copy.close();
   frame.close();
 
-  frame = new VideoFrame([argbPlane], {...vfInit, format: 'ARGB'});
+  frame = new VideoFrame([argbPlane], {...vfInit, format: 'BGRA'});
   assert_equals(frame.planes.length, 1, 'plane count');
-  assert_equals(frame.format, 'ARGB', 'plane format');
+  assert_equals(frame.format, 'BGRA', 'plane format');
 
   alpha_frame_copy = new VideoFrame(frame, {alpha: 'keep'});
-  assert_equals(alpha_frame_copy.format, 'ARGB', 'plane format');
+  assert_equals(alpha_frame_copy.format, 'BGRA', 'plane format');
 
+  // TODO(github.com/w3c/webcodecs/issues/207): Verify hasAlpha.
   opaque_frame_copy = new VideoFrame(frame, {alpha: 'discard'});
-  assert_equals(opaque_frame_copy.format, 'XRGB', 'plane format');
+  assert_equals(opaque_frame_copy.format, 'BGRA', 'plane format');
 
   alpha_frame_copy.close();
   opaque_frame_copy.close();
   frame.close();
-}, 'Test ABGR, ARGB VideoFrames with alpha={keep,discard}');
+}, 'Test RGBA, BGRA VideoFrames with alpha={keep,discard}');
 
 test(t => {
   let canvas = makeOffscreenCanvas(16, 16, {alpha: true});
   let frame = new VideoFrame(canvas);
+  // TODO(github.com/w3c/webcodecs/issues/207): Verify hasAlpha.
   assert_true(
-      frame.format == 'ABGR' || frame.format == 'ARGB' ||
+      frame.format == 'RGBA' || frame.format == 'BGRA' ||
           (frame.format == 'I420' && frame.planes.length == 4),
       'plane format should have alpha: ' + frame.format);
   frame.close();
 
+  // TODO(github.com/w3c/webcodecs/issues/207): Verify hasAlpha.
   frame = new VideoFrame(canvas, {alpha: 'discard'});
-  assert_true(
-      frame.format != 'ABGR' || frame.format != 'ARGB',
-      'plane format should be opaque');
   frame.close();
 }, 'Test a VideoFrame constructed from canvas can drop the alpha channel.');
