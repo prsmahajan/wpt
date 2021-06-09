@@ -1,6 +1,6 @@
 from os.path import join, dirname
 
-import mock
+from unittest import mock
 import pytest
 
 from .base import all_products, active_products

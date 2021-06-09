@@ -1,7 +1,7 @@
 import logging
 import sys
 
-import mock
+from unittest import mock
 import pytest
 
 from os.path import join, dirname

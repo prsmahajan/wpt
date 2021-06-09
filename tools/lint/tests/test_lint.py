@@ -2,7 +2,7 @@ import io
 import os
 import sys
 
-import mock
+from unittest import mock
 
 from ...localpaths import repo_root
 from .. import lint as lint_mod

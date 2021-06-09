@@ -1,6 +1,6 @@
 import logging
 import inspect
-import mock
+from unittest import mock
 import pytest
 import subprocess
 import sys

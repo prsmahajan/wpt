@@ -18,7 +18,7 @@ __all__ = ["SeleniumServer", "ChromeDriverServer", "CWTChromeDriverServer",
            "ServoDriverServer", "WebKitDriverServer", "WebDriverServer"]
 
 
-class WebDriverServer(object):
+class WebDriverServer:
     __metaclass__ = abc.ABCMeta
 
     default_base_path = "/"
@@ -79,7 +79,7 @@ class WebDriverServer(object):
             self._proc.run()
         except OSError as e:
             if e.errno == errno.ENOENT:
-                raise IOError(
+                raise OSError(
                     "WebDriver executable not found: %s" % self.binary)
             raise
         self._output_handler.after_process_start(self._proc.pid)
@@ -221,7 +221,7 @@ def get_free_port():
         s = socket.socket()
         try:
             s.bind(("127.0.0.1", 0))
-        except socket.error:
+        except OSError:
             continue
         else:
             return s.getsockname()[1]
@@ -240,7 +240,7 @@ def wait_for_service(addr, timeout=60):
             so.connect(addr)
         except socket.timeout:
             pass
-        except socket.error as e:
+        except OSError as e:
             if e.errno != errno.ECONNREFUSED:
                 raise
         else:
@@ -248,4 +248,4 @@ def wait_for_service(addr, timeout=60):
         finally:
             so.close()
         time.sleep(0.5)
-    raise socket.error("Service is unavailable: %s:%i" % addr)
+    raise OSError("Service is unavailable: %s:%i" % addr)

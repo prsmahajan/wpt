@@ -45,7 +45,7 @@ def get_free_port():
         s = socket.socket()
         try:
             s.bind(("127.0.0.1", 0))
-        except socket.error:
+        except OSError:
             continue
         else:
             return s.getsockname()[1]
@@ -76,7 +76,7 @@ class BrowserError(Exception):
     pass
 
 
-class Browser(object):
+class Browser:
     """Abstract class serving as the basis for Browser implementations.
 
     The Browser is used in the TestRunnerManager to start and stop the browser
@@ -155,7 +155,7 @@ class Browser(object):
 
 class NullBrowser(Browser):
     def __init__(self, logger, **kwargs):
-        super(NullBrowser, self).__init__(logger)
+        super().__init__(logger)
 
     def start(self, **kwargs):
         """No-op browser to use in scenarios where the TestRunnerManager shouldn't
